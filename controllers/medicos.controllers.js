@@ -18,11 +18,15 @@ const MedicosConsultorios = async(req , res) => {
     const Medicos  = (await connectionDB()).medicos;
     const Consultorios  = (await connectionDB()).consultorios;
     const medicos = (await Medicos.find().toArray()).map(e=> {return {consultorio:e.med_consultoria, nombre: e.med_nombreCompleto}});
-    medicos.forEach(async(e) => {
-        const consultorios = (await (Consultorios.find({cons_codigo: e.consultorio}).toArray()));
-
+    medicos.map((e) => {
+        const consultorios = async()=> await Consultorios.find({cons_codigo: e.consultorio}).toArray();
+        medicosConsultorio.push({
+            medico: e.nombre,
+            consultorios: Promise.all([consultorios])
+        });
+        console.log(medicosConsultorio);
     });
-    res.json(medicos);
+    res.json(medicosConsultorio);
 };
 
 module.exports = {
